@@ -17,6 +17,10 @@ fflonk = { git = "https://github.com/notfork-h/fflonk", branch = "main" }
 
 [workspace]
 resolver = "2"
+[workspace]
+exclude = [
+  "substrate/frame/contracts/mock-network"
+]
 
 members = [
 	"bridges/bin/runtime-common",
