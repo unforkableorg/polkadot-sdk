@@ -1,9 +1,19 @@
 [workspace.package]
-authors = ["Parity Technologies <admin@parity.io>"]
+authors = ["Unforkable"]
 edition = "2021"
-repository = "https://github.com/paritytech/polkadot-sdk.git"
+repository = "https://github.com/unforkableorg/polkadot-sdk.git"
 license = "GPL-3.0-only"
-homepage = "https://paritytech.github.io/polkadot-sdk/master/polkadot_sdk_docs/index.html"
+homepage = "https://github.com/unforkableorg/polkadot-sdk"
+
+[patch."https://github.com/w3f/fflonk"]
+fflonk = { git = "https://github.com/notfork-h/fflonk", branch = "main" }
+
+[patch."https://github.com/w3f/ring-proof"]
+fflonk = { git = "https://github.com/notfork-h/fflonk", branch = "main" }
+
+[patch."https://github.com/w3f/ring-vrf"]
+fflonk = { git = "https://github.com/notfork-h/fflonk", branch = "main" }
+
 
 [workspace]
 resolver = "2"
