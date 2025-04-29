@@ -233,7 +233,9 @@ construct_runtime!(
 		System: frame_system,
 		Balances: pallet_balances,
 		ParasOrigin: origin,
+		#[codec(index = 2)]
 		XcmPallet: pallet_xcm,
+		#[codec(index = 3)]
 		MessageQueue: pallet_message_queue,
 	}
 );
