@@ -230,15 +230,14 @@ impl pallet_message_queue::Config for Runtime {
 
 construct_runtime!(
 	pub enum Runtime {
-		System: frame_system,
-		Balances: pallet_balances,
-		ParasOrigin: origin,
-		XcmPallet: pallet_xcm,
-		MessageQueue: pallet_message_queue,
+		System: frame_system = 0,
+		Balances: pallet_balances = 1,
+		ParasOrigin: origin = 2,
+		XcmPallet: pallet_xcm = 5,
+		MessageQueue: pallet_message_queue = 4,
 	}
 );
 
-pub use self::Runtime;
 pub use Runtime as RelayRuntime;
 pub use RuntimeCall as RelayRuntimeCall;
 pub use RuntimeOrigin as RelayRuntimeOrigin;
