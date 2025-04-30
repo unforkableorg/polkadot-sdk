@@ -233,9 +233,15 @@ construct_runtime!(
 		System: frame_system,
 		Balances: pallet_balances,
 		ParasOrigin: origin,
-		#[codec(index = 2)]
 		XcmPallet: pallet_xcm,
-		#[codec(index = 3)]
 		MessageQueue: pallet_message_queue,
 	}
 );
+
+pub use Runtime::*;
+pub use Runtime as RelayRuntime;
+pub use RuntimeCall as RelayRuntimeCall;
+pub use RuntimeOrigin as RelayRuntimeOrigin;
+pub use RuntimeEvent as RelayRuntimeEvent;
+pub use AllPalletsWithSystem as RelayAllPalletsWithSystem;
+
