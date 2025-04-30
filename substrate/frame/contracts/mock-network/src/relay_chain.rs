@@ -238,7 +238,7 @@ construct_runtime!(
 	}
 );
 
-pub use Runtime::*;
+pub use self::Runtime;
 pub use Runtime as RelayRuntime;
 pub use RuntimeCall as RelayRuntimeCall;
 pub use RuntimeOrigin as RelayRuntimeOrigin;
