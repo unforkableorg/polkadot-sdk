@@ -1767,7 +1767,7 @@ pub fn unreachable() -> ! {
 }
 
 /// A default panic handler for the runtime environment.
-#[cfg(all(not(feature = "disable_panic_handler"), substrate_runtime))]
+#[cfg(all(not(feature = "disable_panic_handler"), substrate_runtime, not(target_arch = "wasm32")))]
 #[panic_handler]
 #[no_mangle]
 pub fn panic(info: &core::panic::PanicInfo) -> ! {
