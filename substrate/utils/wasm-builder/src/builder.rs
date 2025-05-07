@@ -250,7 +250,7 @@ impl WasmBuilder {
 
 	/// Build the WASM binary.
 	pub fn build(mut self) {
-		let target = crate::RuntimeTarget;
+		let target = crate::runtime_target();
 		if target == RuntimeTarget::Wasm {
 			if self.export_heap_base {
 				self.rust_flags.push("-Clink-arg=--export=__heap_base".into());
