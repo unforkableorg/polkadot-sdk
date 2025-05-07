@@ -890,7 +890,7 @@ fn build_bloaty_blob(
 	if crate::build_std_required() {
 		// Unfortunately this is still a nightly-only flag, but FWIW it is pretty widely used
 		// so it's unlikely to break without a replacement.
-		build_cmd.arg("-Z").arg("build-std");
+		build_cmd.arg("-Z").arg("build-std=core,alloc,std");
 		if !cargo_cmd.supports_nightly_features() {
 			build_cmd.env("RUSTC_BOOTSTRAP", "1");
 		}
