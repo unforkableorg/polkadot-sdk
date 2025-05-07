@@ -42,6 +42,8 @@ pub struct WasmBuilderSelectProject {
 	/// This parameter just exists to make it impossible to construct
 	/// this type outside of this crate.
 	_ignore: (),
+	/// par défaut on sandbox (double compilation)
+	sandboxed: bool,
 }
 
 impl WasmBuilderSelectProject {
@@ -60,6 +62,7 @@ impl WasmBuilderSelectProject {
 			disable_runtime_version_section_check: false,
 			export_heap_base: false,
 			import_memory: false,
+			sandboxed: self.sandboxed,
 			#[cfg(feature = "metadata-hash")]
 			enable_metadata_hash: None,
 		}
@@ -80,12 +83,19 @@ impl WasmBuilderSelectProject {
 				disable_runtime_version_section_check: false,
 				export_heap_base: false,
 				import_memory: false,
+				sandboxed: self.sandboxed,
 				#[cfg(feature = "metadata-hash")]
 				enable_metadata_hash: None,
 			})
 		} else {
 			Err("Project path must point to the `Cargo.toml` of the project")
 		}
+	}
+
+	/// Désactive la compilation isolée (sandbox)
+	pub fn disable_wasm_sandbox(mut self) -> Self {
+		self.sandboxed = false;
+		self
 	}
 }
 
@@ -123,12 +133,17 @@ pub struct WasmBuilder {
 	/// Whether to enable the metadata hash generation.
 	#[cfg(feature = "metadata-hash")]
 	enable_metadata_hash: Option<MetadataExtraInfo>,
+	/// déterminé par la méthode disable_wasm_sandbox()
+	sandboxed: bool,
 }
 
 impl WasmBuilder {
 	/// Create a new instance of the builder.
 	pub fn new() -> WasmBuilderSelectProject {
-		WasmBuilderSelectProject { _ignore: () }
+		WasmBuilderSelectProject { 
+			_ignore: (),
+			sandboxed: true,
+		}
 	}
 
 	/// Build the WASM binary using the recommended default values.
@@ -235,7 +250,7 @@ impl WasmBuilder {
 
 	/// Build the WASM binary.
 	pub fn build(mut self) {
-		let target = crate::runtime_target();
+		let target = crate::RuntimeTarget;
 		if target == RuntimeTarget::Wasm {
 			if self.export_heap_base {
 				self.rust_flags.push("-Clink-arg=--export=__heap_base".into());
@@ -250,13 +265,29 @@ impl WasmBuilder {
 		let file_path =
 			out_dir.join(self.file_name.clone().unwrap_or_else(|| "wasm_binary.rs".into()));
 
-		if check_skip_build() {
-			// If we skip the build, we still want to make sure to be called when an env variable
-			// changes
+		// si on a choisi de désactiver la sandbox, on saute seulement la double compilation,
+		// mais on ne respecte pas SKIP_WASM_BUILD
+		let skip = check_skip_build();
+		if skip {
 			generate_rerun_if_changed_instructions();
-
 			provide_dummy_wasm_binary_if_not_exist(&file_path);
+			return
+		}
 
+		// si sandboxed == false, on ne fait qu'un build "host" (pas de double compilation)
+		if !self.sandboxed {
+			build_project(
+				target,
+				file_path,
+				self.project_cargo_toml,
+				self.rust_flags.into_iter().map(|f| format!("{} ", f)).collect(),
+				self.features_to_enable,
+				self.file_name,
+				!self.disable_runtime_version_section_check,
+				#[cfg(feature = "metadata-hash")]
+				self.enable_metadata_hash,
+			);
+			generate_rerun_if_changed_instructions();
 			return
 		}
 
@@ -272,8 +303,6 @@ impl WasmBuilder {
 			self.enable_metadata_hash,
 		);
 
-		// As last step we need to generate our `rerun-if-changed` stuff. If a build fails, we don't
-		// want to spam the output!
 		generate_rerun_if_changed_instructions();
 	}
 }
