@@ -161,6 +161,7 @@ impl WasmBuilder {
 			.with_current_project()
 			.import_memory()
 			.export_heap_base()
+			.no_default_features(true) // 👈 empêche les features std de remonter
 			.build();
 	}
 
